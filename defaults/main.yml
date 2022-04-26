@@ -1,5 +1,5 @@
 ---
-# defaults file for portal.stage
+# defaults file for stage_portal
 documents_root: /var/www
 key_path: /root/.ssh
 

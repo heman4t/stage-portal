@@ -92,52 +92,7 @@
   become: yes
   become_user: sammy
 
-- name: Ensure {{ documents_root }}/{{ current_root }} directory has correct permissions.
-  file:
-    path: "{{ documents_root }}/{{ current_root }}"
-    state: directory
-    owner: sammy
-    group: www-data
-    mode: u=rw,g=r,o=r
-  tags: ['permission']
 
-- name: Set {{ documents_root }}/{{ current_root }}/* files permission.
-  file:
-    path: "{{ documents_root }}/{{ current_root }}"
-    owner: sammy
-    group: www-data
-    mode: u=rw,g=r,o=r
-    recurse: yes
-  tags: ['permission']
-
-- name: Set {{ documents_root }}/{{ current_root }}/* directories permission.
-  file:
-    path: "{{ documents_root }}/{{ current_root }}"
-    state: directory
-    owner: sammy
-    group: www-data
-    mode: u=rw,g=rX,o=r
-    recurse: yes
-  tags: ['permission']
-
-- name: Set Project Directory permission.
-  file:
-    path: "{{ documents_root }}/{{ current_root }}/{{ item }}"
-    state: directory
-    owner: www-data
-    group: www-data
-    mode: u=rwX,g=rX,o=r
-    recurse: yes
-  loop: ['storage']
-  tags: ['permission']
-
-- name: Set Project Directory permission.
-  file:
-    path: "{{ documents_root }}/{{ current_root }}/{{ item }}"
-    state: directory
-    owner: www-data
-    group: www-data
-    mode: u=rw,g=r,o=r
-    recurse: yes
-  loop: ['public/images','public/document']
-  tags: ['permission']
+- name: project permissions
+  import_tasks: project_permissions.yml
+  tags: [ 'permission' ]
