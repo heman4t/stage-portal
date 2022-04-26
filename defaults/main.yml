@@ -1,2 +1,7 @@
 ---
 # defaults file for portal.stage
+documents_root: /var/www
+key_path: /root/.ssh
+
+current_repo:
+current_root:
