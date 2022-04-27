@@ -1,0 +1,46 @@
+
+- name: Ensure {{ documents_root }} directory has correct permissions.
+  file:
+    path: "{{ documents_root }}"
+    state: directory
+    owner: root
+    group: www-data
+    mode: u=rw,g=rX,o=r
+  tags: ['permission']
+
+- name: Ensure {{ documents_root }}/{{ current_root }} directory has correct permissions.
+  file:
+    path: "{{ documents_root }}/{{ current_root }}"
+    state: directory
+    owner: root
+    group: www-data
+    mode: u=rw,g=rX,o=r
+  tags: ['permission']
+
+- name: add github ssh key
+  copy: >
+    src=files/{{current_root}}.key
+    dest={{key_path}}/{{current_root}}.key
+    owner=root
+    group=root
+    mode=0600
+
+- name: store the statistics of {{ documents_root }}/{{ current_root }} in the 'destFolder' variable
+  stat:
+    path: "{{ documents_root }}/{{ current_root }}"
+  register: destFolder
+
+- name: Reset any changes other then GIT
+  command: git reset --hard
+  args:
+    chdir: "{{ documents_root }}/{{ current_root }}"
+  when: destFolder.stat.nlink >= 3
+
+- name: Checkout Code from Git Repository
+  ansible.builtin.git: >
+    repo={{ current_repo }}
+    dest={{ documents_root }}/{{ current_root }}
+    key_file={{key_path}}/{{current_root}}.key
+    accept_hostkey=yes
+    update=yes
+    clone=yes

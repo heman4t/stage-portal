@@ -1,0 +1,42 @@
+
+- name: Set User permission.
+  file: dest={{ documents_root }}/{{ current_root }}/{{ item }} owner=sammy group=www-data mode=u=rwX,g=rX,o=rX recurse=yes
+  loop: ['/']
+
+- name: Set Project Directory permission.
+  file: dest={{ documents_root }}/{{ current_root }}/{{ item }} owner=www-data group=www-data mode=u=rwX,g=rX,o=rX recurse=yes
+  loop: ['storage','public/images','public/document']
+
+- name: Add Env File
+  copy: >
+    src=files/.env
+    dest={{ documents_root }}/{{ current_root }}/.env
+    owner=sammy
+    group=www-data
+    mode=0644
+
+- name: "Composer install"
+  composer:
+    command: install
+    global_command: false
+    working_dir: "{{ documents_root }}/{{ current_root }}"
+  become: yes
+  become_user: sammy
+
+- name: Run artisan clear-compiled
+  shell: php {{ documents_root }}/{{ current_root }}/artisan clear-compiled
+  become: yes
+  become_user: sammy
+
+- name: "Composer dump-autoload"
+  composer:
+    command: dump-autoload
+    global_command: false
+    working_dir: "{{ documents_root }}/{{ current_root }}"
+  become: yes
+  become_user: sammy
+
+- name: Run artisan clear-compiled
+  shell: php {{ documents_root }}/{{ current_root }}/artisan optimize
+  become: yes
+  become_user: sammy

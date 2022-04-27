@@ -1,97 +1,19 @@
 
-- name: Upadte and Upgrade OS
+- name: Upadte OS Repository
   import_tasks: update.yml
-- name: Upadte and Upgrade OS
+  tags: [ 'aptUpdate', 'apt' ]
+
+- name: Upgrade OS Packages
   import_tasks: upgrade.yml
+  tags: [ 'aptUpgrade', 'apt' ]
 
-- name: Ensure {{ documents_root }} directory has correct permissions.
-  file:
-    path: "{{ documents_root }}"
-    state: directory
-    owner: root
-    group: www-data
-    mode: u=rw,g=rX,o=r
-  tags: ['permission']
+- name: Checkout from GIT
+  import_tasks: checkout.yml
+  tags: [ 'checkout', 'github' ]
 
-- name: Ensure {{ documents_root }}/{{ current_root }} directory has correct permissions.
-  file:
-    path: "{{ documents_root }}/{{ current_root }}"
-    state: directory
-    owner: root
-    group: www-data
-    mode: u=rw,g=rX,o=r
-  tags: ['permission']
-
-- name: add github ssh key
-  copy: >
-    src=files/{{current_root}}.key
-    dest={{key_path}}/{{current_root}}.key
-    owner=root
-    group=root
-    mode=0600
-
-- name: store the statistics of {{ documents_root }}/{{ current_root }} in the 'destFolder' variable
-  stat:
-    path: "{{ documents_root }}/{{ current_root }}"
-  register: destFolder
-
-- name: Reset any changes other then GIT
-  command: git reset --hard
-  args:
-    chdir: "{{ documents_root }}/{{ current_root }}"
-  when: destFolder.stat.nlink >= 3
-
-- name: Checkout Code from Git Repository
-  ansible.builtin.git: >
-    repo={{ current_repo }}
-    dest={{ documents_root }}/{{ current_root }}
-    key_file={{key_path}}/{{current_root}}.key
-    accept_hostkey=yes
-    update=yes
-    clone=yes
-
-- name: Set User permission.
-  file: dest={{ documents_root }}/{{ current_root }}/{{ item }} owner=sammy group=www-data mode=u=rwX,g=rX,o=rX recurse=yes
-  loop: ['/']
-
-- name: Set Project Directory permission.
-  file: dest={{ documents_root }}/{{ current_root }}/{{ item }} owner=www-data group=www-data mode=u=rwX,g=rX,o=rX recurse=yes
-  loop: ['storage','public/images','public/document']
-
-- name: Add Env File
-  copy: >
-    src=files/.env
-    dest={{ documents_root }}/{{ current_root }}/.env
-    owner=sammy
-    group=www-data
-    mode=0644
-
-- name: "Composer install"
-  composer:
-    command: install
-    global_command: false
-    working_dir: "{{ documents_root }}/{{ current_root }}"
-  become: yes
-  become_user: sammy
-
-- name: Run artisan clear-compiled
-  shell: php {{ documents_root }}/{{ current_root }}/artisan clear-compiled
-  become: yes
-  become_user: sammy
-
-- name: "Composer dump-autoload"
-  composer:
-    command: dump-autoload
-    global_command: false
-    working_dir: "{{ documents_root }}/{{ current_root }}"
-  become: yes
-  become_user: sammy
-
-- name: Run artisan clear-compiled
-  shell: php {{ documents_root }}/{{ current_root }}/artisan optimize
-  become: yes
-  become_user: sammy
-
+- name: Post Checkout
+  import_tasks: post_checkout.yml
+  tags: [ 'postCheckout' ]
 
 - name: project permissions
   import_tasks: project_permissions.yml
