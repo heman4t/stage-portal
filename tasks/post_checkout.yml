@@ -1,11 +1,10 @@
-
 - name: Set User permission.
   file: dest={{ documents_root }}/{{ current_root }}/{{ item }} owner=sammy group=www-data mode=u=rwX,g=rX,o=rX recurse=yes
   loop: ['/']
 
 - name: Set Project Directory permission.
   file: dest={{ documents_root }}/{{ current_root }}/{{ item }} owner=www-data group=www-data mode=u=rwX,g=rX,o=rX recurse=yes
-  loop: ['storage','public/images','public/document']
+  loop: ['storage', 'public/images', 'public/document']
 
 - name: Add Env File
   copy: >

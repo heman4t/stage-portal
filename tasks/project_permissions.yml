@@ -1,4 +1,3 @@
-
 - name: Ensure {{ documents_root }}/{{ current_root }} directory has correct permissions.
   file:
     path: "{{ documents_root }}/{{ current_root }}"
@@ -46,5 +45,5 @@
     group: www-data
     mode: u=rw,g=r,o=r
     recurse: yes
-  loop: ['public/images','public/document']
+  loop: ['public/images', 'public/document']
   tags: ['permission']

@@ -1,20 +1,19 @@
-
 - name: Upadte OS Repository
   import_tasks: update.yml
-  tags: [ 'aptUpdate', 'apt' ]
+  tags: ['aptUpdate', 'apt']
 
 - name: Upgrade OS Packages
   import_tasks: upgrade.yml
-  tags: [ 'aptUpgrade', 'apt' ]
+  tags: ['aptUpgrade', 'apt']
 
 - name: Checkout from GIT
   import_tasks: checkout.yml
-  tags: [ 'checkout', 'github' ]
+  tags: ['checkout', 'github']
 
 - name: Post Checkout
   import_tasks: post_checkout.yml
-  tags: [ 'postCheckout' ]
+  tags: ['postCheckout']
 
 - name: project permissions
   import_tasks: project_permissions.yml
-  tags: [ 'permission' ]
+  tags: ['permission']
